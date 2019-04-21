@@ -6,14 +6,14 @@ import pprint
 import requests
 import re
 
-all_rss_link_default = 'https://jenkins.hyperledger.org/job/fabric-verify-unit-tests-x86_64/rssAll'
-fail_rss_link_default = 'https://jenkins.hyperledger.org/job/fabric-verify-unit-tests-x86_64/rssFailed'
-fail_rss_link = ''
+all_rss_link_default = "https://jenkins.hyperledger.org/job/fabric-verify-unit-tests-x86_64/rssAll"
+fail_rss_link_default = "https://jenkins.hyperledger.org/job/fabric-verify-unit-tests-x86_64/rssFailed"
+fail_rss_link = ""
 
 fail_logs_base_dir_default = r"C:\Users\ronensch\Box Sync\Blockchain\flaky-tests\failed-logs-archive"
-fail_logs_base_dir = ''
-fail_gossip_logs_dir = ''
-fail_non_gossip_logs_dir = ''
+fail_logs_base_dir = ""
+fail_gossip_logs_dir = ""
+fail_non_gossip_logs_dir = ""
 
 gossip_modules = [
     "github.com/hyperledger/fabric/gossip/api",
@@ -45,10 +45,10 @@ gossip_modules = [
 ]
 
 
-STATS_NEW_GOSSIP_LOGS = 'new_gossip_logs'
-STATS_NEW_NON_GOSSIP_LOGS = 'new_non_gossip_logs'
-STATS_OLD_LOGS = 'old_logs'
-STATS_TOTAL_LOGS = 'total_logs'
+STATS_NEW_GOSSIP_LOGS = "new_gossip_logs"
+STATS_NEW_NON_GOSSIP_LOGS = "new_non_gossip_logs"
+STATS_OLD_LOGS = "old_logs"
+STATS_TOTAL_LOGS = "total_logs"
 stats = {
     STATS_NEW_GOSSIP_LOGS : 0,
     STATS_NEW_NON_GOSSIP_LOGS : 0,
@@ -66,11 +66,11 @@ def is_gossip_failed(log):
 
 
 def extract_id(entry):
-    return re.search(r":(\d+)$", entry['id']).group(1)
+    return re.search(r":(\d+)$", entry["id"]).group(1)
 
 
 def extract_date(entry):
-    return datetime.datetime.strptime(entry['published'], "%Y-%m-%dT%H:%M:%SZ")
+    return datetime.datetime.strptime(entry["published"], "%Y-%m-%dT%H:%M:%SZ")
 
 
 def build_file_name(entry):
@@ -85,7 +85,7 @@ def is_log_file_exists(file_name):
 
 
 def get_and_save_log(entry):
-    log_link = entry['link'] + "consoleText"
+    log_link = entry["link"] + "consoleText"
     r = requests.get(log_link)
     log = r.text
     if is_gossip_failed(log):
@@ -101,13 +101,13 @@ def get_and_save_log(entry):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Script to download and save failed logs from Jenkins')
-    parser.add_argument('--base-dir',
+    parser = argparse.ArgumentParser(description="Script to download and save failed logs from Jenkins")
+    parser.add_argument("--base-dir",
                         default=fail_logs_base_dir_default,
-                        help='The base directory where the logs will be saved')
-    parser.add_argument('--rss',
+                        help="The base directory where the logs will be saved")
+    parser.add_argument("--rss",
                         default=fail_rss_link_default,
-                        help='The RSS link to download from')
+                        help="The RSS link to download from")
 
     args = parser.parse_args()
     global fail_logs_base_dir, fail_gossip_logs_dir, fail_non_gossip_logs_dir
