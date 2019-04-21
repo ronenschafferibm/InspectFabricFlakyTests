@@ -4,44 +4,16 @@ import glob
 import os
 import pandas as pd
 
-fail_gossip_logs_dir_default = r"C:\Users\ronensch\Box Sync\Blockchain\flaky-tests\failed-logs-archive\gossip"
+import common
 
-# TODO: Move to common
-gossip_modules = [
-    "github.com/hyperledger/fabric/gossip/api",
-    "github.com/hyperledger/fabric/gossip/comm",
-    "github.com/hyperledger/fabric/gossip/comm/mock",
-    "github.com/hyperledger/fabric/gossip/common",
-    "github.com/hyperledger/fabric/gossip/discovery",
-    "github.com/hyperledger/fabric/gossip/election",
-    "github.com/hyperledger/fabric/gossip/filter",
-    "github.com/hyperledger/fabric/gossip/gossip",
-    "github.com/hyperledger/fabric/gossip/gossip/algo",
-    "github.com/hyperledger/fabric/gossip/gossip/channel",
-    "github.com/hyperledger/fabric/gossip/gossip/msgstore",
-    "github.com/hyperledger/fabric/gossip/gossip/pull",
-    "github.com/hyperledger/fabric/gossip/identity",
-    "github.com/hyperledger/fabric/gossip/integration",
-    "github.com/hyperledger/fabric/gossip/metrics",
-    # "github.com/hyperledger/fabric/gossip/metrics/mocks",
-    # "github.com/hyperledger/fabric/gossip/mocks",
-    "github.com/hyperledger/fabric/gossip/privdata",
-    # "github.com/hyperledger/fabric/gossip/privdata/common",
-    # "github.com/hyperledger/fabric/gossip/privdata/mocks",
-    "github.com/hyperledger/fabric/gossip/protoext",
-    "github.com/hyperledger/fabric/gossip/service",
-    # "github.com/hyperledger/fabric/gossip/service/mocks",
-    "github.com/hyperledger/fabric/gossip/state",
-    "github.com/hyperledger/fabric/gossip/state/mocks",
-    "github.com/hyperledger/fabric/gossip/util",
-]
+fail_gossip_logs_dir_default = r"C:\Users\ronensch\Box Sync\Blockchain\flaky-tests\failed-logs-archive\gossip"
 
 
 def find_failed_modules(log_file):
     failed_modules = []
     with open(log_file, "r") as f:
         log = f.read()
-        for module in gossip_modules:
+        for module in common.gossip_modules:
             fail_pattern = "{}\t{}\t".format("FAIL", module)
             if fail_pattern in log:
                 failed_modules.append(module)
@@ -69,7 +41,7 @@ def main():
     log_files = glob.glob(os.path.join(fail_gossip_logs_dir, "*.log"))
 
     # fail_tbl[file][module] -> 0/1
-    fail_tbl = pd.DataFrame(columns=gossip_modules)
+    fail_tbl = pd.DataFrame(columns=common.gossip_modules)
     fail_tbl.insert(0, "file_name", "")
     for file in log_files:
         failed_modules = find_failed_modules(file)
@@ -78,7 +50,7 @@ def main():
         fail_tbl = fail_tbl.append(row, ignore_index=True)
 
     # Strip the common prefix from all columns
-    column_map = {m: m.split("github.com/hyperledger/fabric/gossip/")[1] for m in gossip_modules}
+    column_map = {m: m.split("github.com/hyperledger/fabric/gossip/")[1] for m in common.gossip_modules}
     fail_tbl.rename(columns=column_map, inplace=True)
 
     # Create a report file
