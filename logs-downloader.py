@@ -6,6 +6,8 @@ import pprint
 import requests
 import re
 
+import common
+
 all_rss_link_default = "https://jenkins.hyperledger.org/job/fabric-verify-unit-tests-x86_64/rssAll"
 fail_rss_link_default = "https://jenkins.hyperledger.org/job/fabric-verify-unit-tests-x86_64/rssFailed"
 fail_rss_link = ""

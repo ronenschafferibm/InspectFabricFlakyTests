@@ -56,11 +56,14 @@ def main():
     # Create a report file
     report_file_name = "report.csv"
     report_file_path = os.path.join(fail_gossip_logs_dir, report_file_name)
+    print(report_file_path)
     fail_tbl.to_csv(report_file_path, index=False)
 
     # Create a summary file
     summary_file_name = "summary.csv"
     summary_file_path = os.path.join(fail_gossip_logs_dir, summary_file_name)
+    print(summary_file_path)
+    fail_tbl.count().to_csv(summary_file_path, header=False)
 
 
 if __name__ == "__main__":
