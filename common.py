@@ -1,3 +1,5 @@
+import re
+
 gossip_modules = [
     "github.com/hyperledger/fabric/gossip/api",
     "github.com/hyperledger/fabric/gossip/comm",
@@ -26,3 +28,14 @@ gossip_modules = [
     "github.com/hyperledger/fabric/gossip/state/mocks",
     "github.com/hyperledger/fabric/gossip/util",
 ]
+
+
+def find_failed_tests(log_file):
+    failed_tests = []
+    with open(log_file, "r", encoding="unicode_escape") as f:
+        log = f.read()
+        fail_pattern = r"--- FAIL:\s+(.*?)\s"
+        failed_tests = re.findall(fail_pattern, log)
+        if not failed_tests:
+            failed_tests = ['*** unknown test ***']
+    return failed_tests

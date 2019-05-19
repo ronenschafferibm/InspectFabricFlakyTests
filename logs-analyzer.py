@@ -45,13 +45,21 @@ def main():
     fail_tbl.insert(0, "file_name", "")
     for file in log_files:
         failed_modules = find_failed_modules(file)
-        row = {m: 1 for m in failed_modules}
-        row["file_name"] = os.path.basename(file)
+        failed_tests = common.find_failed_tests(file)
+        row = {**{m: 1 for m in failed_modules} , **{t: 1 for t in failed_tests}}
+        file_name = os.path.basename(file)
+        row["date"] = file_name.split("-")[0]
+        row["file_name"] = file_name
         fail_tbl = fail_tbl.append(row, ignore_index=True)
 
     # Strip the common prefix from all columns
     column_map = {m: m.split("github.com/hyperledger/fabric/gossip/")[1] for m in common.gossip_modules}
     fail_tbl.rename(columns=column_map, inplace=True)
+
+    # Reorder columns. Place `date` column next to `file_name`
+    cols = list(fail_tbl)
+    cols.insert(1, cols.pop(cols.index("date")))
+    fail_tbl = fail_tbl.loc[:, cols]
 
     # Create a report file
     report_file_name = "report.csv"

@@ -5,6 +5,8 @@ import os
 import pandas as pd
 import re
 
+import common
+
 fail_non_gossip_logs_dir_default = r"C:\Users\ronensch\Box Sync\Blockchain\flaky-tests\failed-logs-archive\non-gossip"
 
 
@@ -14,7 +16,7 @@ def find_failed_modules(log_file):
         log = f.read()
         fail_pattern = r"FAIL\s+github.com/hyperledger/fabric/(.*?)\s"
         failed_modules = re.findall(fail_pattern, log)
-        if failed_modules == []:
+        if not failed_modules:
             failed_modules = ['???']
     return failed_modules
 
@@ -44,9 +46,17 @@ def main():
     fail_tbl.insert(0, "file_name", "")
     for file in log_files:
         failed_modules = find_failed_modules(file)
-        row = {m: 1 for m in failed_modules}
-        row["file_name"] = os.path.basename(file)
+        failed_tests = common.find_failed_tests(file)
+        row = {**{m: 1 for m in failed_modules} , **{t: 1 for t in failed_tests}}
+        file_name = os.path.basename(file)
+        row["date"] = file_name.split("-")[0]
+        row["file_name"] = file_name
         fail_tbl = fail_tbl.append(row, ignore_index=True)
+
+    # Reorder columns. Place `date` column next to `file_name`
+    cols = list(fail_tbl)
+    cols.insert(1, cols.pop(cols.index("date")))
+    fail_tbl = fail_tbl.loc[:, cols]
 
     # Create a report file
     report_file_name = "report.csv"
